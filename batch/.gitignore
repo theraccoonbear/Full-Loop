@@ -1,4 +1,4 @@
 *.json
 radar-pull-old.pl
 !.gitignore
-!.example.json
+!*.example.json

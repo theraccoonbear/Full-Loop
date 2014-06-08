@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>Radar</title>
+<link type="text/css" href="css/style.css" rel="stylesheet" />
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/radar-cities.js"></script>
+<script type="text/javascript">
+	if (location.hash.length < 2) {
+		location.hash = '#madison';
+	}
+
+  $(document).ready(function() {
+		var cache_timing = {};
+		var cache_url = {};
+		var clicked = false;
+		var $radar = $('#radar');
+		var $links = $('#links');
+		var $loader = $('#loader');
+		var cur = '';
+		var loc = '';
+		
+		
+		
+		$.each(locations, function(idx, val) {
+			$links.append($('<a></a>').attr('href', '#' + val).html(val).click(function() {
+				clicked = true;
+			})).append('&nbsp;&nbsp;');
+			cache_timing[val] = 0;
+			cache_url[val] = '/images/radar/' + val + '/animated/historic.gif?' + Math.random();
+		});
+		
+		$radar.get(0).onload = function() {
+			cache_timing[cur] = new Date().getTime();
+			_gaq.push(['_trackPageview', '/radar/' + cur]);
+			$loader.hide();
+		};
+		
+		
+		
+		var setImage = function() {
+			loc = location.hash.substr(1);
+			if (loc != cur || clicked) {
+				var ts = new Date().getTime();
+				if (ts - cache_timing[loc] > 600000) {
+					$loader.show();
+					$loader.find('h2').html('loading ' + loc + '...');
+					cur = loc;
+					cache_url[loc] = '/images/radar/' + loc + '/animated/historic.gif?' + Math.random();
+					$radar.attr('src', cache_url[loc]);
+				} else {
+					$radar.attr('src', cache_url[loc]);
+				}
+				clicked = false;
+			}
+		};
+		
+		setImage();
+		
+		setInterval(function() {
+			setImage();
+		}, 100);
+		
+		setInterval(function() {
+			clicked = true;
+		}, 600000);
+	});
+</script>
+</head>
+<body>
+
+<img src="/images/radar/madison/animated/historic.gif" alt="radar" id="radar" />
+<div id="links"></div>
+<div id="loader">
+	<div id="gray" class="transparent"></div>
+	<img src="/images/radar/misc/spinner.gif" alt="Radar" class="opaque"/>
+	<h2 class="opaque"></h2>
+</div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-15804777-1']);
+  _gaq.push(['_trackPageview','/radar/' + location.hash.substr(1)]);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
